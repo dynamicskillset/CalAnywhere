@@ -15,6 +15,7 @@ interface AppointmentEmailPayload {
 const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY;
 const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN;
 const MAILGUN_FROM_EMAIL = process.env.MAILGUN_FROM_EMAIL;
+const MAILGUN_API_BASE = process.env.MAILGUN_API_BASE || "https://api.eu.mailgun.net";
 const BASE_PUBLIC_URL = process.env.BASE_PUBLIC_URL || "http://localhost:5173";
 
 if (!MAILGUN_API_KEY || !MAILGUN_DOMAIN || !MAILGUN_FROM_EMAIL) {
@@ -74,14 +75,21 @@ export async function sendAppointmentRequestEmail(
   form.append("subject", subject);
   form.append("text", text);
 
-  const url = `https://api.mailgun.net/v3/${MAILGUN_DOMAIN}/messages`;
+  const url = `${MAILGUN_API_BASE}/v3/${MAILGUN_DOMAIN}/messages`;
 
-  await axios.post(url, form, {
-    headers: {
-      Authorization: `Basic ${auth}`,
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    timeout: 10000
-  });
+  try {
+    await axios.post(url, form, {
+      headers: {
+        Authorization: `Basic ${auth}`,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      timeout: 10000
+    });
+  } catch (err: any) {
+    const message = err.response?.data?.message || err.message;
+    // eslint-disable-next-line no-console
+    console.error(`Mailgun API error: ${message}`);
+    throw new Error(`Email send failed: ${message}`);
+  }
 }
 
