@@ -118,12 +118,24 @@ export async function fetchAndParseCalendar(
         }
 
         // Handle exclusions (EXDATE)
+        // node-ical returns exdate as an object with date strings as keys and Date objects as values
         const exdates = new Set<string>();
         if (event.exdate) {
-          const exdateArray = Array.isArray(event.exdate) ? event.exdate : [event.exdate];
-          for (const exdate of exdateArray) {
-            const exdateDate = new Date(exdate);
-            exdates.add(exdateDate.toISOString().split("T")[0]); // YYYY-MM-DD
+          // exdate can be an object with date keys, or sometimes an array
+          const exdateValues = typeof event.exdate === "object" && !Array.isArray(event.exdate)
+            ? Object.values(event.exdate)
+            : Array.isArray(event.exdate) ? event.exdate : [event.exdate];
+
+          for (const exdate of exdateValues) {
+            try {
+              // Handle both Date objects and date strings
+              const exdateDate = exdate instanceof Date ? exdate : new Date(exdate);
+              if (!isNaN(exdateDate.getTime())) {
+                exdates.add(exdateDate.toISOString().split("T")[0]); // YYYY-MM-DD
+              }
+            } catch {
+              // Skip invalid exdate values
+            }
           }
         }
 

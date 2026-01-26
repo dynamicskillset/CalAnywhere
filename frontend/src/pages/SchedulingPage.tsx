@@ -120,17 +120,37 @@ export function SchedulingPage() {
       }
 
       const slots: Slot[] = [];
-      for (let h = 9; h < 17; h++) {
-        const start = new Date(
-          day.getFullYear(),
-          day.getMonth(),
-          day.getDate(),
-          h,
-          0,
-          0,
-          0
-        );
-        const end = new Date(start.getTime() + duration * 60000);
+      const buffer = page.bufferMinutes ?? 0;
+      const slotInterval = duration + buffer; // Time between slot starts
+
+      // Start at 9:00, end by 17:00 (5 PM)
+      const dayStart = new Date(
+        day.getFullYear(),
+        day.getMonth(),
+        day.getDate(),
+        9,
+        0,
+        0,
+        0
+      );
+      const dayEnd = new Date(
+        day.getFullYear(),
+        day.getMonth(),
+        day.getDate(),
+        17,
+        0,
+        0,
+        0
+      );
+
+      // Iterate in duration-minute increments
+      for (
+        let slotStart = dayStart.getTime();
+        slotStart + duration * 60000 <= dayEnd.getTime();
+        slotStart += slotInterval * 60000
+      ) {
+        const start = new Date(slotStart);
+        const end = new Date(slotStart + duration * 60000);
 
         // Skip slots that don't meet minimum notice requirement
         if (start < earliestStart) {
