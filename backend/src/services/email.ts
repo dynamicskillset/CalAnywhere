@@ -16,7 +16,7 @@ const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY;
 const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN;
 const MAILGUN_FROM_EMAIL = process.env.MAILGUN_FROM_EMAIL;
 const MAILGUN_API_BASE = process.env.MAILGUN_API_BASE || "https://api.eu.mailgun.net";
-const BASE_PUBLIC_URL = process.env.BASE_PUBLIC_URL || "http://localhost:5173";
+
 
 if (!MAILGUN_API_KEY || !MAILGUN_DOMAIN || !MAILGUN_FROM_EMAIL) {
   // eslint-disable-next-line no-console
@@ -92,4 +92,3 @@ export async function sendAppointmentRequestEmail(
     throw new Error(`Email send failed: ${message}`);
   }
 }
-

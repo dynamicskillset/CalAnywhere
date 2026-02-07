@@ -126,7 +126,7 @@ pagesRouter.post("/", createPageLimiter, async (req, res) => {
   try {
     // Validate calendar URL and count events
     const validation = await validateCalendarUrl(body.calendarUrl);
-    
+
     if (!validation.isValid) {
       return res.status(400).json({
         error:
@@ -273,4 +273,3 @@ pagesRouter.post("/:slug/requests", requestLimiter, async (req, res) => {
     });
   }
 });
-

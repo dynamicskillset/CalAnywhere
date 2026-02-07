@@ -335,7 +335,7 @@ export function HomePage() {
                   className="input mt-2"
                 />
                 <p id="date-range-hint" className="label-hint">
-                  1–180 days
+                  1-180 days
                 </p>
               </div>
             </div>
@@ -369,7 +369,7 @@ export function HomePage() {
                 onClick={() => setStep(1)}
                 className="btn-ghost"
               >
-                ← Back
+                &larr; Back
               </button>
               <button
                 type="submit"

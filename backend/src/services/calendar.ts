@@ -8,14 +8,21 @@ export interface BusySlot {
 }
 
 /**
+ * Returns true if the given Date object is valid (not NaN).
+ */
+function isValidDate(d: Date): boolean {
+  return d instanceof Date && !isNaN(d.getTime());
+}
+
+/**
  * Converts node-ical's rrule format to an RRule instance
  */
 function parseRRule(rrule: any, dtstart: Date): RRule {
   // If it's already a string (most common case with node-ical)
   if (typeof rrule === "string") {
     // Remove RRULE: prefix if present
-    const cleanStr = rrule.startsWith("RRULE:") 
-      ? rrule.substring(6) 
+    const cleanStr = rrule.startsWith("RRULE:")
+      ? rrule.substring(6)
       : rrule;
     return RRule.fromString(cleanStr);
   }
@@ -47,7 +54,12 @@ function parseRRule(rrule: any, dtstart: Date): RRule {
 
   if (rrule.interval !== undefined) options.interval = rrule.interval;
   if (rrule.count !== undefined) options.count = rrule.count;
-  if (rrule.until) options.until = new Date(rrule.until);
+  if (rrule.until) {
+    const untilDate = new Date(rrule.until);
+    if (isValidDate(untilDate)) {
+      options.until = untilDate;
+    }
+  }
   if (rrule.byweekday !== undefined) options.byweekday = rrule.byweekday;
   if (rrule.bymonthday !== undefined) options.bymonthday = rrule.bymonthday;
   if (rrule.bymonth !== undefined) options.bymonth = rrule.bymonth;
@@ -102,6 +114,9 @@ export async function fetchAndParseCalendar(
     const eventStart = new Date(event.start);
     const eventEnd = new Date(event.end);
 
+    // Skip events with invalid dates
+    if (!isValidDate(eventStart) || !isValidDate(eventEnd)) continue;
+
     // Handle recurring events
     if (event.rrule) {
       try {
@@ -110,7 +125,13 @@ export async function fetchAndParseCalendar(
         let occurrences: Date[];
         if (typeof event.rrule.between === "function") {
           // Already parsed by node-ical, use directly
-          occurrences = event.rrule.between(startDate, endDate, true);
+          try {
+            occurrences = event.rrule.between(startDate, endDate, true);
+          } catch {
+            // If node-ical's pre-parsed RRule throws, fall back to manual parsing
+            const rrule = parseRRule(event.rrule, eventStart);
+            occurrences = rrule.between(startDate, endDate, true);
+          }
         } else {
           // Need to parse manually
           const rrule = parseRRule(event.rrule, eventStart);
@@ -130,7 +151,7 @@ export async function fetchAndParseCalendar(
             try {
               // Handle both Date objects and date strings
               const exdateDate = exdate instanceof Date ? exdate : new Date(exdate);
-              if (!isNaN(exdateDate.getTime())) {
+              if (isValidDate(exdateDate)) {
                 exdates.add(exdateDate.toISOString().split("T")[0]); // YYYY-MM-DD
               }
             } catch {
@@ -140,20 +161,30 @@ export async function fetchAndParseCalendar(
         }
 
         for (const occurrence of occurrences) {
-          // Check if this occurrence is excluded
-          const occurrenceDateStr = occurrence.toISOString().split("T")[0];
-          if (exdates.has(occurrenceDateStr)) continue;
+          try {
+            // Skip invalid occurrence dates
+            if (!isValidDate(occurrence)) continue;
 
-          // Calculate duration from original event
-          const duration = eventEnd.getTime() - eventStart.getTime();
-          const occurrenceEnd = new Date(occurrence.getTime() + duration);
+            // Check if this occurrence is excluded
+            const occurrenceDateStr = occurrence.toISOString().split("T")[0];
+            if (exdates.has(occurrenceDateStr)) continue;
 
-          // Only include if it overlaps with our range
-          if (occurrenceEnd >= startDate && occurrence <= endDate) {
-            busySlots.push({
-              start: occurrence.toISOString(),
-              end: occurrenceEnd.toISOString()
-            });
+            // Calculate duration from original event
+            const duration = eventEnd.getTime() - eventStart.getTime();
+            const occurrenceEnd = new Date(occurrence.getTime() + duration);
+
+            if (!isValidDate(occurrenceEnd)) continue;
+
+            // Only include if it overlaps with our range
+            if (occurrenceEnd >= startDate && occurrence <= endDate) {
+              busySlots.push({
+                start: occurrence.toISOString(),
+                end: occurrenceEnd.toISOString()
+              });
+            }
+          } catch {
+            // Skip individual bad occurrences without failing the whole series
+            continue;
           }
         }
       } catch (err: any) {

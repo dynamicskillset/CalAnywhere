@@ -48,4 +48,3 @@ export const pagesStore = new InMemoryPagesStore();
 setInterval(() => {
   pagesStore.purgeExpired();
 }, 15 * 60 * 1000);
-

@@ -339,7 +339,7 @@ export function SchedulingPage() {
                       <div className="flex flex-wrap gap-1.5">
                         {slots.map((slot) => {
                           const isSelected =
-                            selectedSlot &&
+                            !!selectedSlot &&
                             selectedSlot.start.getTime() ===
                               slot.start.getTime() &&
                             selectedSlot.end.getTime() === slot.end.getTime();

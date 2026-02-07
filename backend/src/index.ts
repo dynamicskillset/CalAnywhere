@@ -9,8 +9,10 @@ const port = process.env.PORT || 4000;
 
 app.set('trust proxy', 1);
 
-// Basic security headers
-app.use(helmet());
+// Basic security headers (CSP disabled — frontend is served separately)
+app.use(helmet({
+  contentSecurityPolicy: false
+}));
 
 // CORS: allow all in development, restrict via env in production
 const allowedOrigin =
@@ -40,4 +42,3 @@ app.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`Scheduler backend listening on port ${port}`);
 });
-
