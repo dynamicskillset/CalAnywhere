@@ -52,8 +52,10 @@ export function SchedulingPage() {
   const [requesterEmail, setRequesterEmail] = useState("");
   const [reason, setReason] = useState("");
   const [notes, setNotes] = useState("");
+  const [website, setWebsite] = useState(""); // honeypot
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [verificationSent, setVerificationSent] = useState(false);
 
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -254,18 +256,22 @@ export function SchedulingPage() {
     if (!page || !slug || !selectedSlot) return;
     setIsSubmitting(true);
     setSuccessMessage(null);
+    setVerificationSent(false);
     setError(null);
     try {
+      const savedEmail = requesterEmail;
       await axios.post(`/api/pages/${slug}/requests`, {
         requesterName,
         requesterEmail,
         reason,
         notes,
         startIso: selectedSlot.start.toISOString(),
-        endIso: selectedSlot.end.toISOString()
+        endIso: selectedSlot.end.toISOString(),
+        honeypot: website
       });
+      setVerificationSent(true);
       setSuccessMessage(
-        `Your appointment request has been sent to ${page.ownerName}. They will respond to your email address (${requesterEmail}).`
+        `Check your email at ${savedEmail} for a confirmation link. Your request won't be sent to ${page.ownerName} until you confirm.`
       );
       setRequesterName("");
       setRequesterEmail("");
@@ -462,7 +468,7 @@ export function SchedulingPage() {
 
               {successMessage && (
                 <div
-                  className="alert-success mb-3"
+                  className={`${verificationSent ? "alert-info" : "alert-success"} mb-3`}
                   role="status"
                   aria-live="polite"
                 >
@@ -481,6 +487,20 @@ export function SchedulingPage() {
               )}
 
               <form ref={formRef} onSubmit={handleSubmit} className="space-y-3">
+                {/* Honeypot field — hidden from humans, visible to bots */}
+                <div className="honeypot-field" aria-hidden="true">
+                  <label htmlFor="website">Website</label>
+                  <input
+                    id="website"
+                    name="website"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                  />
+                </div>
+
                 <p className="text-[10px] text-content-subtle">
                   Fields marked with <span className="text-error">*</span> are
                   required.

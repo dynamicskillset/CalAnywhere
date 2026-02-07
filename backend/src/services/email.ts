@@ -25,6 +25,69 @@ if (!MAILGUN_API_KEY || !MAILGUN_DOMAIN || !MAILGUN_FROM_EMAIL) {
   );
 }
 
+interface VerificationEmailPayload {
+  requesterEmail: string;
+  requesterName: string;
+  ownerName: string;
+  startIso: string;
+  endIso: string;
+  confirmUrl: string;
+  timezone?: string;
+}
+
+export async function sendVerificationEmail(
+  payload: VerificationEmailPayload
+): Promise<void> {
+  if (!MAILGUN_API_KEY || !MAILGUN_DOMAIN || !MAILGUN_FROM_EMAIL) {
+    throw new Error("Mailgun not configured");
+  }
+
+  const start = new Date(payload.startIso);
+  const end = new Date(payload.endIso);
+  const tzLabel = payload.timezone ? ` (${payload.timezone})` : "";
+
+  const subject = `Confirm your appointment request with ${payload.ownerName}`;
+
+  const bodyLines = [
+    `Hi ${payload.requesterName},\n`,
+    `Please confirm your appointment request by clicking the link below:\n`,
+    payload.confirmUrl,
+    `\nREQUEST DETAILS`,
+    `- With: ${payload.ownerName}`,
+    `- From: ${start.toISOString()}${tzLabel}`,
+    `- To:   ${end.toISOString()}${tzLabel}\n`,
+    `This link expires in 1 hour. If you did not make this request, you can safely ignore this email.\n`,
+    `— Scheduler`
+  ];
+
+  const text = bodyLines.join("\n");
+
+  const auth = Buffer.from(`api:${MAILGUN_API_KEY}`).toString("base64");
+
+  const form = new URLSearchParams();
+  form.append("from", MAILGUN_FROM_EMAIL);
+  form.append("to", payload.requesterEmail);
+  form.append("subject", subject);
+  form.append("text", text);
+
+  const url = `${MAILGUN_API_BASE}/v3/${MAILGUN_DOMAIN}/messages`;
+
+  try {
+    await axios.post(url, form, {
+      headers: {
+        Authorization: `Basic ${auth}`,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      timeout: 10000
+    });
+  } catch (err: any) {
+    const message = err.response?.data?.message || err.message;
+    // eslint-disable-next-line no-console
+    console.error(`Mailgun API error (verification): ${message}`);
+    throw new Error(`Verification email send failed: ${message}`);
+  }
+}
+
 export async function sendAppointmentRequestEmail(
   payload: AppointmentEmailPayload
 ): Promise<void> {

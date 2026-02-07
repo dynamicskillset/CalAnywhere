@@ -199,6 +199,15 @@
     @apply mx-auto mt-0.5 h-1 w-1 rounded-full bg-accent;
   }
 
+  /* Honeypot field — visually hidden but not display:none (bots detect that) */
+  .honeypot-field {
+    position: absolute;
+    left: -9999px;
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+  }
+
   /* Loading skeleton */
   .skeleton {
     @apply animate-pulse rounded bg-surface-overlay;
