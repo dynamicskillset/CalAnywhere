@@ -176,22 +176,58 @@ export function HomePage() {
           Share your calendar availability privately
         </h1>
         <p className="mt-3 text-content-muted">
-          No sign-up, no database, no tracking. URLs expire on your schedule.
+          No sign-up, no database, no tracking. Links expire on your schedule.
         </p>
         <p className="mt-4 text-sm text-content-muted">
-          Scheduler reads your existing calendar's free/busy data and creates a
-          temporary link you can share with anyone. Ideal for freelancers,
-          consultants, educators, or anyone who wants to offer appointment
-          slots without signing up for yet another service.
+          Paste one or more calendar links from any provider — Google, Outlook,
+          Proton, Apple, or anything that offers an ICS feed — and Scheduler
+          creates a temporary page showing only when you're free. Ideal for
+          freelancers juggling multiple clients, educators with split
+          timetables, or anyone who wants to offer appointment slots without
+          yet another account.
         </p>
         <div className="mt-5 flex flex-col gap-1 text-xs text-content-muted sm:flex-row sm:gap-4">
-          <span><span className="font-semibold text-accent-text">1.</span> Paste a calendar URL</span>
+          <span><span className="font-semibold text-accent-text">1.</span> Paste a calendar link</span>
           <span className="hidden sm:inline" aria-hidden="true">&#8594;</span>
           <span><span className="font-semibold text-accent-text">2.</span> Set your preferences</span>
           <span className="hidden sm:inline" aria-hidden="true">&#8594;</span>
           <span><span className="font-semibold text-accent-text">3.</span> Share the link</span>
         </div>
       </header>
+
+      <section className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2" aria-label="Key features">
+        <div>
+          <h2 className="text-sm font-semibold text-content">Works with any calendar</h2>
+          <p className="mt-1 text-xs text-content-muted">
+            Google, Outlook, Proton, Apple, Fastmail — anything with an ICS
+            link. Merge up to five calendars so your availability reflects all
+            your commitments.
+          </p>
+        </div>
+        <div>
+          <h2 className="text-sm font-semibold text-content">Ephemeral by design</h2>
+          <p className="mt-1 text-xs text-content-muted">
+            Links self-destruct after a duration you choose, from one hour to
+            30 days. Nothing is stored once a link expires — no database, no
+            backups, no trace.
+          </p>
+        </div>
+        <div>
+          <h2 className="text-sm font-semibold text-content">Spam-free requests</h2>
+          <p className="mt-1 text-xs text-content-muted">
+            Every appointment request is verified by email before it reaches
+            you. Combined with rate limiting and bot detection, only genuine
+            requests get through.
+          </p>
+        </div>
+        <div>
+          <h2 className="text-sm font-semibold text-content">Fully configurable</h2>
+          <p className="mt-1 text-xs text-content-muted">
+            Set appointment length, buffer time, minimum notice, working days,
+            and how far ahead visitors can book — from one day to six months.
+          </p>
+        </div>
+      </section>
 
       <section className="card mb-8" aria-label="Create scheduling page">
         {/* Step indicator */}
@@ -262,8 +298,8 @@ export function HomePage() {
                 </button>
               )}
               <p className="label-hint mt-2">
-                We only read free/busy information. No event details are shown
-                to requesters.
+                Only free/busy times are read — no event titles, descriptions,
+                or attendees are ever shared.
               </p>
             </div>
 
@@ -562,8 +598,8 @@ export function HomePage() {
           <a href="https://dynamicskillset.com" className="underline hover:text-content-muted">
             Dynamic Skillset
           </a>.
-          Calendar details stay with your provider — only availability is shared.
-          No data is stored after your link expires.
+          Your calendar details never leave your provider — only availability is
+          shared. All data is deleted when your link expires.
         </p>
       </footer>
     </main>
