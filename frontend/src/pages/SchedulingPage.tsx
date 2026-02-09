@@ -391,6 +391,9 @@ export function SchedulingPage() {
                   {page.bio}
                 </p>
               )}
+              <p className="mt-1 text-xs text-content-muted">
+                Choose an available time below to request an appointment.
+              </p>
             </div>
             <div className="shrink-0 text-xs text-content-muted">
               Link expires in{" "}
@@ -407,6 +410,7 @@ export function SchedulingPage() {
             {/* Left: Mini Calendar (hidden on mobile) */}
             <div className="hidden md:block">
               <div className="card">
+                <h2 className="sr-only">Month calendar</h2>
                 <MiniCalendar
                   displayMonth={miniCalMonth}
                   availableDates={availableDates}
@@ -430,6 +434,7 @@ export function SchedulingPage() {
 
             {/* Center: Week View */}
             <div className="card" role="region" aria-label="Available time slots">
+              <h2 className="sr-only">Weekly time slots</h2>
               <WeekView
                 weekStart={currentWeekStart}
                 onPrevWeek={() => navigateWeek(-1)}
@@ -478,6 +483,7 @@ export function SchedulingPage() {
 
               {error && (
                 <div
+                  id="request-form-error"
                   className="alert-error mb-3"
                   role="alert"
                   aria-live="assertive"
@@ -501,7 +507,7 @@ export function SchedulingPage() {
                   />
                 </div>
 
-                <p className="text-[10px] text-content-subtle">
+                <p className="text-xs text-content-subtle">
                   Fields marked with <span className="text-error">*</span> are
                   required.
                 </p>
@@ -562,7 +568,7 @@ export function SchedulingPage() {
                     aria-describedby="reason-count"
                     className="input-dark mt-1"
                   />
-                  <p id="reason-count" className="label-hint text-[10px]">
+                  <p id="reason-count" className="label-hint">
                     {reason.length}/500 characters (min 10)
                   </p>
                 </div>
@@ -583,7 +589,7 @@ export function SchedulingPage() {
                     aria-describedby="notes-count"
                     className="input-dark mt-1"
                   />
-                  <p id="notes-count" className="label-hint text-[10px]">
+                  <p id="notes-count" className="label-hint">
                     {notes.length}/500 characters
                   </p>
                 </div>
@@ -593,6 +599,7 @@ export function SchedulingPage() {
                   disabled={!selectedSlot || isSubmitting}
                   aria-busy={isSubmitting}
                   aria-disabled={!selectedSlot}
+                  aria-describedby={error ? "request-form-error" : undefined}
                   className="btn-primary w-full"
                 >
                   {isSubmitting

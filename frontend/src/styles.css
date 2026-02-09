@@ -20,7 +20,7 @@
     /* Text colors — Nord Snow Storm + Frost */
     --color-content: 236 239 244;          /* #ECEFF4 */
     --color-content-muted: 216 222 233;    /* #D8DEE9 */
-    --color-content-subtle: 143 188 187;   /* #8FBCBB - Frost */
+    --color-content-subtle: 163 208 207;   /* #A3D0CF - Frost (lightened for AA at small sizes) */
     --color-content-inverse: 46 52 64;     /* #2E3440 */
 
     /* Accent colors — Nord Aurora yellow (gold) */
@@ -163,11 +163,11 @@
   }
 
   .week-header-cell {
-    @apply text-center text-[10px] font-medium uppercase tracking-wider text-content-muted;
+    @apply text-center text-xs font-medium uppercase tracking-wider text-content-muted;
   }
 
   .week-time-label {
-    @apply pr-2 text-right text-[10px] text-content-subtle;
+    @apply pr-2 text-right text-xs text-content-subtle;
   }
 
   .week-nav-btn {
@@ -193,7 +193,7 @@
   }
 
   .mini-cal-outside {
-    @apply mini-cal-cell text-content-subtle/40;
+    @apply mini-cal-cell text-content-subtle/65;
   }
 
   .mini-cal-dot {

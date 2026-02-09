@@ -178,6 +178,19 @@ export function HomePage() {
         <p className="mt-3 text-content-muted">
           No sign-up, no database, no tracking. URLs expire on your schedule.
         </p>
+        <p className="mt-4 text-sm text-content-muted">
+          Scheduler reads your existing calendar's free/busy data and creates a
+          temporary link you can share with anyone. Ideal for freelancers,
+          consultants, educators, or anyone who wants to offer appointment
+          slots without signing up for yet another service.
+        </p>
+        <div className="mt-5 flex flex-col gap-1 text-xs text-content-muted sm:flex-row sm:gap-4">
+          <span><span className="font-semibold text-accent-text">1.</span> Paste a calendar URL</span>
+          <span className="hidden sm:inline" aria-hidden="true">&#8594;</span>
+          <span><span className="font-semibold text-accent-text">2.</span> Set your preferences</span>
+          <span className="hidden sm:inline" aria-hidden="true">&#8594;</span>
+          <span><span className="font-semibold text-accent-text">3.</span> Share the link</span>
+        </div>
       </header>
 
       <section className="card mb-8" aria-label="Create scheduling page">
@@ -207,6 +220,9 @@ export function HomePage() {
         {/* Step 1: Calendar URL(s) */}
         {step === 1 && (
           <form onSubmit={handleValidateCalendar} className="space-y-4">
+            <h2 className="text-lg font-semibold text-content">
+              Step 1: Paste your calendar URL
+            </h2>
             <div>
               <label className="label required-indicator">
                 Calendar subscription URL(s) (ICS/iCal)
@@ -218,7 +234,8 @@ export function HomePage() {
                     required={index === 0}
                     autoComplete="url"
                     aria-label={`Calendar URL ${index + 1}`}
-                    placeholder="https://mail.proton.me/api/calendar/v1/..."
+                    aria-describedby={index === 0 && error ? "calendar-url-error" : undefined}
+                    placeholder="https://calendar.example.com/your-calendar.ics"
                     value={url}
                     onChange={(e) => updateCalendarUrl(index, e.target.value)}
                     className="input"
@@ -251,7 +268,7 @@ export function HomePage() {
             </div>
 
             {error && (
-              <div className="alert-error" role="alert" aria-live="assertive">
+              <div id="calendar-url-error" className="alert-error" role="alert" aria-live="assertive">
                 {error}
               </div>
             )}
@@ -277,6 +294,9 @@ export function HomePage() {
         {/* Step 2: User Details */}
         {step === 2 && (
           <form onSubmit={handleCreatePage} className="space-y-4">
+            <h2 className="text-lg font-semibold text-content">
+              Step 2: Your details and preferences
+            </h2>
             <p className="text-xs text-content-muted">
               Fields marked with <span className="text-error">*</span> are
               required.
@@ -441,7 +461,7 @@ export function HomePage() {
             </div>
 
             {error && (
-              <div className="alert-error" role="alert" aria-live="assertive">
+              <div id="details-error" className="alert-error" role="alert" aria-live="assertive">
                 {error}
               </div>
             )}
@@ -469,6 +489,9 @@ export function HomePage() {
         {/* Step 3: Share Link */}
         {step === 3 && createdPage && (
           <div className="space-y-4" role="region" aria-label="Share your link">
+            <h2 className="text-lg font-semibold text-content">
+              Step 3: Share your scheduling link
+            </h2>
             <p className="text-sm text-content/90">
               Your scheduling page is ready. Share this link with anyone who
               should be able to request a time with you.
@@ -535,8 +558,12 @@ export function HomePage() {
 
       <footer className="mt-auto pt-8 text-xs text-content-subtle">
         <p>
-          Privacy-first scheduling. Calendar details stay with your provider —
-          only availability is shared.
+          Privacy-first scheduling by{" "}
+          <a href="https://dynamicskillset.com" className="underline hover:text-content-muted">
+            Dynamic Skillset
+          </a>.
+          Calendar details stay with your provider — only availability is shared.
+          No data is stored after your link expires.
         </p>
       </footer>
     </main>

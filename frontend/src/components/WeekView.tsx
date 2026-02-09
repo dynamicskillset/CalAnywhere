@@ -111,7 +111,7 @@ export function WeekView({
             {formatWeekRange(_weekStart, weekDays)}
           </span>
         </div>
-        <span className="text-[10px] text-content-subtle">{timezone}</span>
+        <span className="text-xs text-content-subtle">{timezone}</span>
       </div>
 
       {/* Grid */}
@@ -158,7 +158,7 @@ export function WeekView({
                       type="button"
                       onClick={() => onSelectSlot(slot)}
                       className={sel ? "week-cell-selected" : "week-cell-available"}
-                      aria-label={`${day.dateStr} ${row.label}`}
+                      aria-label={`${day.date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })} at ${row.label}, available`}
                       aria-pressed={sel}
                     >
                       {row.label}
@@ -167,8 +167,8 @@ export function WeekView({
                 }
 
                 return (
-                  <div key={key} className="week-cell-busy">
-                    —
+                  <div key={key} className="week-cell-busy" role="img" aria-label="Busy">
+                    <span aria-hidden="true">—</span>
                   </div>
                 );
               })}
@@ -177,7 +177,7 @@ export function WeekView({
         </div>
       </div>
 
-      <p className="mt-3 text-[10px] text-content-subtle">
+      <p className="mt-3 text-xs text-content-subtle">
         Only availability shown — event details remain private.
       </p>
     </div>

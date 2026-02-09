@@ -64,7 +64,7 @@ export function MiniCalendar({
   });
 
   return (
-    <div className="select-none">
+    <div className="select-none" role="group" aria-label={monthLabel}>
       <div className="mb-3 flex items-center justify-between">
         <button
           type="button"
@@ -89,7 +89,7 @@ export function MiniCalendar({
         {DAY_LABELS.map((d) => (
           <div
             key={d}
-            className="flex h-8 items-center justify-center text-[10px] font-medium uppercase tracking-wider text-content-muted"
+            className="flex h-8 items-center justify-center text-xs font-medium uppercase tracking-wider text-content-muted"
           >
             {d.charAt(0)}
           </div>

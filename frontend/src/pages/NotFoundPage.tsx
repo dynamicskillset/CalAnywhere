@@ -17,6 +17,7 @@ export function NotFoundPage() {
       </p>
       <p className="mt-2 text-sm text-content-subtle">
         Scheduling links expire after a set duration for privacy.
+        No data is stored once a link expires.
       </p>
       <Link to="/" className="btn-primary mt-8 px-6 py-3">
         Create a new scheduling page
