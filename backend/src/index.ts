@@ -1,10 +1,11 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import { json } from "body-parser";
+
 import { pagesRouter } from "./routes/pages";
 import { initDatabase } from "./db/client";
 import { runMigrations } from "./db/migrate";
+import { initStores } from "./store";
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -28,7 +29,7 @@ app.use(
   })
 );
 
-app.use(json());
+app.use(express.json());
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
@@ -52,6 +53,8 @@ async function start() {
     // eslint-disable-next-line no-console
     console.log("Falling back to ephemeral in-memory mode.");
   }
+
+  initStores();
 
   app.listen(port, () => {
     // eslint-disable-next-line no-console

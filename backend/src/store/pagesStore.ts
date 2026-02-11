@@ -1,3 +1,5 @@
+import type { IPagesStore } from "./interfaces";
+
 export interface SchedulingPage {
   slug: string;
   calendarUrls: string[];
@@ -13,26 +15,30 @@ export interface SchedulingPage {
   expiresAt: number;
 }
 
-class InMemoryPagesStore {
+export class InMemoryPagesStore implements IPagesStore {
   private pages = new Map<string, SchedulingPage>();
 
-  create(page: SchedulingPage): SchedulingPage {
+  async create(page: SchedulingPage): Promise<SchedulingPage> {
     this.pages.set(page.slug, page);
     return page;
   }
 
-  get(slug: string): SchedulingPage | undefined {
+  async get(slug: string): Promise<SchedulingPage | undefined> {
     const page = this.pages.get(slug);
     if (!page) return undefined;
-    const now = Date.now();
-    if (now >= page.expiresAt) {
+    if (Date.now() >= page.expiresAt) {
       this.pages.delete(slug);
       return undefined;
     }
     return page;
   }
 
-  purgeExpired(): void {
+  async getPageId(slug: string): Promise<string | null> {
+    const page = await this.get(slug);
+    return page ? slug : null;
+  }
+
+  async purgeExpired(): Promise<void> {
     const now = Date.now();
     for (const [slug, page] of this.pages.entries()) {
       if (now >= page.expiresAt) {
@@ -41,10 +47,3 @@ class InMemoryPagesStore {
     }
   }
 }
-
-export const pagesStore = new InMemoryPagesStore();
-
-// Periodic purge every 15 minutes
-setInterval(() => {
-  pagesStore.purgeExpired();
-}, 15 * 60 * 1000);

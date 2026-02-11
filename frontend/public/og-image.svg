@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#2E3440"/>
+  <rect x="60" y="60" width="1080" height="510" rx="24" fill="#3B4252"/>
+  <!-- Calendar icon -->
+  <rect x="120" y="180" width="200" height="200" rx="20" fill="#434C5E"/>
+  <rect x="120" y="180" width="200" height="56" rx="20" fill="#5E81AC"/>
+  <rect x="120" y="216" width="200" height="164" rx="0" fill="#434C5E"/>
+  <circle cx="168" cy="290" r="12" fill="#A3BE8C"/>
+  <circle cx="220" cy="290" r="12" fill="#EBCB8B"/>
+  <circle cx="272" cy="290" r="12" fill="#88C0D0"/>
+  <circle cx="168" cy="340" r="12" fill="#D8DEE9"/>
+  <circle cx="220" cy="340" r="12" fill="#A3BE8C"/>
+  <circle cx="272" cy="340" r="12" fill="#D8DEE9"/>
+  <!-- Text -->
+  <text x="380" y="260" font-family="system-ui, -apple-system, sans-serif" font-size="64" font-weight="700" fill="#ECEFF4">CalAnywhere</text>
+  <text x="380" y="320" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#D8DEE9">Privacy-first scheduling</text>
+  <text x="380" y="360" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#D8DEE9">for any calendar</text>
+  <!-- Tagline -->
+  <text x="380" y="430" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#A3D0CF">Proton &#183; Fastmail &#183; Google &#183; Outlook &#183; Apple &#183; Any ICS feed</text>
+</svg>

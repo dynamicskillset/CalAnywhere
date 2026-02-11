@@ -1,6 +1,7 @@
 import { FormEvent, useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { countdownLabel } from "../utils/date";
 
 interface CreatePageResponse {
   slug: string;
@@ -136,19 +137,6 @@ export function HomePage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const countdownLabel = (expiresAt: number) => {
-    const ms = expiresAt - Date.now();
-    const totalMinutes = Math.max(0, Math.floor(ms / 60000));
-    const totalHours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    if (totalHours >= 24) {
-      const days = Math.floor(totalHours / 24);
-      const hours = totalHours % 24;
-      return `${days}d ${hours}h`;
-    }
-    return `${totalHours}h ${minutes}m`;
   };
 
   const shareUrl = createdPage

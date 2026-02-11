@@ -2,9 +2,8 @@ import { Router } from "express";
 import { v4 as uuidv4 } from "uuid";
 import rateLimit from "express-rate-limit";
 import { sendAppointmentRequestEmail, sendVerificationEmail } from "../services/email";
-import { pendingRequestsStore } from "../store/pendingRequestsStore";
+import { pagesStore, pendingRequestsStore, bookingsStore } from "../store";
 import { validateMultipleCalendarUrls, fetchAndParseMultipleCalendars } from "../services/calendar";
-import { pagesStore } from "../store/pagesStore";
 
 export const pagesRouter = Router();
 
@@ -233,7 +232,7 @@ pagesRouter.post("/", createPageLimiter, async (req, res) => {
     const now = Date.now();
     const expiresAt = now + ttlHours * 60 * 60 * 1000;
 
-    const page = pagesStore.create({
+    const page = await pagesStore.create({
       slug,
       calendarUrls,
       ownerName: body.ownerName,
@@ -265,7 +264,7 @@ pagesRouter.post("/", createPageLimiter, async (req, res) => {
 // GET /api/pages/:slug - fetch page metadata and current availability skeleton
 pagesRouter.get("/:slug", async (req, res) => {
   const slug = req.params.slug;
-  const page = pagesStore.get(slug);
+  const page = await pagesStore.get(slug);
 
   if (!page) {
     return res.status(404).json({
@@ -309,7 +308,7 @@ pagesRouter.get("/:slug", async (req, res) => {
 // POST /api/pages/:slug/requests - submit an appointment request (sends verification email)
 pagesRouter.post("/:slug/requests", requestLimiter, async (req, res) => {
   const slug = req.params.slug;
-  const page = pagesStore.get(slug);
+  const page = await pagesStore.get(slug);
 
   if (!page) {
     return res.status(404).json({
@@ -370,7 +369,7 @@ pagesRouter.post("/:slug/requests", requestLimiter, async (req, res) => {
 
   try {
     // Store as pending and send verification email
-    const pending = pendingRequestsStore.create({
+    const pending = await pendingRequestsStore.create({
       slug,
       requesterName,
       requesterEmail,
@@ -407,7 +406,7 @@ pagesRouter.post("/:slug/requests", requestLimiter, async (req, res) => {
 pagesRouter.get("/:slug/requests/:token/confirm", confirmLimiter, async (req, res) => {
   const { slug, token } = req.params;
 
-  const pending = pendingRequestsStore.get(token);
+  const pending = await pendingRequestsStore.getAndDelete(token);
 
   if (!pending || pending.slug !== slug) {
     return res.status(200).contentType("text/html").send(`<!DOCTYPE html>
@@ -419,10 +418,9 @@ h1{font-size:1.25rem;margin:0 0 .75rem}p{color:#D8DEE9;font-size:.875rem;margin:
 <body><div class="card"><h1>This link has expired or has already been used.</h1><p>Confirmation links are valid for 1 hour and can only be used once.</p></div></body></html>`);
   }
 
-  const page = pagesStore.get(slug);
+  const page = await pagesStore.get(slug);
 
   if (!page) {
-    pendingRequestsStore.delete(token);
     return res.status(200).contentType("text/html").send(`<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page Expired - CalAnywhere</title>
@@ -445,7 +443,25 @@ h1{font-size:1.25rem;margin:0 0 .75rem}p{color:#D8DEE9;font-size:.875rem;margin:
       timezone: pending.timezone
     });
 
-    pendingRequestsStore.delete(token);
+    // Record the booking (best-effort — don't fail if this errors)
+    try {
+      const pageId = await pagesStore.getPageId(slug);
+      if (pageId) {
+        await bookingsStore.create({
+          pageId,
+          requesterName: pending.requesterName,
+          requesterEmail: pending.requesterEmail,
+          reason: pending.reason,
+          notes: pending.notes,
+          startTime: pending.startIso,
+          endTime: pending.endIso,
+          timezone: pending.timezone,
+        });
+      }
+    } catch (_bookingErr) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to create booking record:", _bookingErr);
+    }
 
     const ownerFirst = escapeHtml(page.ownerName.split(" ")[0]);
 

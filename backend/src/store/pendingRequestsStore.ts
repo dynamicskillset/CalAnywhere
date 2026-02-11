@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import type { IPendingRequestsStore } from "./interfaces";
 
 export interface PendingRequest {
   token: string;
@@ -15,12 +16,12 @@ export interface PendingRequest {
 
 const TTL_MS = 60 * 60 * 1000; // 1 hour
 
-class InMemoryPendingRequestsStore {
+export class InMemoryPendingRequestsStore implements IPendingRequestsStore {
   private requests = new Map<string, PendingRequest>();
 
-  create(
+  async create(
     data: Omit<PendingRequest, "token" | "createdAt">
-  ): PendingRequest {
+  ): Promise<PendingRequest> {
     const token = randomUUID();
     const request: PendingRequest = {
       ...data,
@@ -31,7 +32,7 @@ class InMemoryPendingRequestsStore {
     return request;
   }
 
-  get(token: string): PendingRequest | undefined {
+  async get(token: string): Promise<PendingRequest | undefined> {
     const request = this.requests.get(token);
     if (!request) return undefined;
     if (Date.now() - request.createdAt > TTL_MS) {
@@ -41,11 +42,19 @@ class InMemoryPendingRequestsStore {
     return request;
   }
 
-  delete(token: string): void {
+  async getAndDelete(token: string): Promise<PendingRequest | undefined> {
+    const request = await this.get(token);
+    if (request) {
+      this.requests.delete(token);
+    }
+    return request;
+  }
+
+  async delete(token: string): Promise<void> {
     this.requests.delete(token);
   }
 
-  purgeExpired(): void {
+  async purgeExpired(): Promise<void> {
     const now = Date.now();
     for (const [token, request] of this.requests.entries()) {
       if (now - request.createdAt > TTL_MS) {
@@ -54,10 +63,3 @@ class InMemoryPendingRequestsStore {
     }
   }
 }
-
-export const pendingRequestsStore = new InMemoryPendingRequestsStore();
-
-// Purge expired requests every 5 minutes
-setInterval(() => {
-  pendingRequestsStore.purgeExpired();
-}, 5 * 60 * 1000);
