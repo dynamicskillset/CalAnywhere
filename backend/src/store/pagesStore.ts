@@ -4,8 +4,9 @@ export interface SchedulingPage {
   slug: string;
   calendarUrls: string[];
   ownerName: string;
-  ownerEmail: string;
   bio?: string;
+  title?: string;
+  userId?: string;
   defaultDurationMinutes: number;
   bufferMinutes: number;
   dateRangeDays: number;

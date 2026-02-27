@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 
 import { pagesRouter } from "./routes/pages";
 import { createAuthRouter } from "./auth";
+import { createDashboardRouter } from "./routes/dashboard";
 import { initDatabase, getPool } from "./db/client";
 import { runMigrations } from "./db/migrate";
 import { initStores } from "./store";
@@ -57,7 +58,8 @@ async function start() {
   // Auth routes — only available when a database is connected
   const pool = getPool();
   if (pool) {
-    app.use("/auth", createAuthRouter(pool));
+    app.use("/api/auth", createAuthRouter(pool));
+    app.use("/api/dashboard", createDashboardRouter(pool));
   }
 
   // 404 handler must come after all route registrations

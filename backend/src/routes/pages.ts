@@ -4,6 +4,8 @@ import rateLimit from "express-rate-limit";
 import { sendAppointmentRequestEmail, sendVerificationEmail } from "../services/email";
 import { pagesStore, pendingRequestsStore, bookingsStore } from "../store";
 import { validateMultipleCalendarUrls, fetchAndParseMultipleCalendars } from "../services/calendar";
+import { encrypt, decrypt } from "../utils/encryption";
+import { getPool } from "../db/client";
 
 export const pagesRouter = Router();
 
@@ -236,7 +238,6 @@ pagesRouter.post("/", createPageLimiter, async (req, res) => {
       slug,
       calendarUrls,
       ownerName: body.ownerName,
-      ownerEmail: body.ownerEmail,
       bio: body.bio,
       defaultDurationMinutes: body.defaultDurationMinutes ?? 30,
       bufferMinutes: body.bufferMinutes ?? 0,
@@ -246,6 +247,26 @@ pagesRouter.post("/", createPageLimiter, async (req, res) => {
       createdAt: now,
       expiresAt
     });
+
+    // Store notification email encrypted (PostgreSQL only)
+    if (body.ownerEmail) {
+      const pool = getPool();
+      if (pool) {
+        try {
+          const encrypted = encrypt(body.ownerEmail);
+          await pool.query(
+            `UPDATE scheduling_pages
+             SET notification_email_enc = $1,
+                 notification_email_iv = $2,
+                 notification_email_tag = $3
+             WHERE slug = $4`,
+            [encrypted.ciphertext, encrypted.iv, encrypted.tag, slug]
+          );
+        } catch {
+          // Non-fatal: page still works, just no email notifications
+        }
+      }
+    }
 
     return res.status(201).json({
       slug,
@@ -267,8 +288,23 @@ pagesRouter.get("/:slug", async (req, res) => {
   const page = await pagesStore.get(slug);
 
   if (!page) {
+    // Check if the page exists but is expired (PostgreSQL only)
+    const pool = getPool();
+    if (pool) {
+      const { rows } = await pool.query(
+        `SELECT owner_name, expires_at FROM scheduling_pages WHERE slug = $1`,
+        [slug]
+      );
+      if (rows.length > 0) {
+        return res.status(410).json({
+          expired: true,
+          ownerName: rows[0].owner_name,
+          expiredAt: rows[0].expires_at,
+        });
+      }
+    }
     return res.status(404).json({
-      error: "This scheduling link has expired or does not exist."
+      error: "This scheduling page does not exist."
     });
   }
 
@@ -431,17 +467,42 @@ h1{font-size:1.25rem;margin:0 0 .75rem}p{color:#D8DEE9;font-size:.875rem;margin:
   }
 
   try {
-    await sendAppointmentRequestEmail({
-      ownerName: page.ownerName,
-      ownerEmail: page.ownerEmail,
-      requesterName: pending.requesterName,
-      requesterEmail: pending.requesterEmail,
-      reason: pending.reason,
-      notes: pending.notes,
-      startIso: pending.startIso,
-      endIso: pending.endIso,
-      timezone: pending.timezone
-    });
+    // Decrypt notification email from DB (if available)
+    let ownerEmail: string | null = null;
+    const pool = getPool();
+    if (pool) {
+      const { rows: emailRows } = await pool.query(
+        `SELECT notification_email_enc, notification_email_iv, notification_email_tag
+         FROM scheduling_pages WHERE slug = $1`,
+        [slug]
+      );
+      if (emailRows.length > 0 && emailRows[0].notification_email_enc) {
+        try {
+          ownerEmail = decrypt({
+            ciphertext: emailRows[0].notification_email_enc,
+            iv: emailRows[0].notification_email_iv,
+            tag: emailRows[0].notification_email_tag,
+          });
+        } catch {
+          // Decryption failed — skip email notification
+        }
+      }
+    }
+
+    // Send email notification if we have an address
+    if (ownerEmail) {
+      await sendAppointmentRequestEmail({
+        ownerName: page.ownerName,
+        ownerEmail,
+        requesterName: pending.requesterName,
+        requesterEmail: pending.requesterEmail,
+        reason: pending.reason,
+        notes: pending.notes,
+        startIso: pending.startIso,
+        endIso: pending.endIso,
+        timezone: pending.timezone
+      });
+    }
 
     // Record the booking (best-effort — don't fail if this errors)
     try {

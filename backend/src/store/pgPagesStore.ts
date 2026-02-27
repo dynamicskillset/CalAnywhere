@@ -12,22 +12,24 @@ export class PgPagesStore implements IPagesStore {
 
       const result = await client.query(
         `INSERT INTO scheduling_pages
-           (slug, owner_name, owner_email, bio,
+           (slug, user_id, owner_name, title, bio,
             default_duration_minutes, buffer_minutes, date_range_days,
             min_notice_hours, include_weekends, is_anonymous,
             created_at, expires_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,TRUE,$10,$11)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
          RETURNING id`,
         [
           page.slug,
+          page.userId || null,
           page.ownerName,
-          page.ownerEmail,
+          page.title || null,
           page.bio || null,
           page.defaultDurationMinutes,
           page.bufferMinutes,
           page.dateRangeDays,
           page.minNoticeHours,
           page.includeWeekends,
+          !page.userId, // is_anonymous when no user
           new Date(page.createdAt).toISOString(),
           new Date(page.expiresAt).toISOString(),
         ]
@@ -56,8 +58,9 @@ export class PgPagesStore implements IPagesStore {
     const result = await this.pool.query(
       `SELECT
          sp.slug,
+         sp.user_id,
          sp.owner_name,
-         sp.owner_email,
+         sp.title,
          sp.bio,
          sp.default_duration_minutes,
          sp.buffer_minutes,
@@ -85,7 +88,8 @@ export class PgPagesStore implements IPagesStore {
       slug: row.slug,
       calendarUrls: row.calendar_urls,
       ownerName: row.owner_name,
-      ownerEmail: row.owner_email,
+      title: row.title || undefined,
+      userId: row.user_id || undefined,
       bio: row.bio || undefined,
       defaultDurationMinutes: row.default_duration_minutes,
       bufferMinutes: row.buffer_minutes,
