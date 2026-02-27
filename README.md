@@ -1,4 +1,4 @@
-![CalAnywhere logo](https://github.com/dynamicskillset/CalAnywhere/blob/main/calanywhere.jpg?raw=true)
+![CalAnywhere logo](https://github.com/dynamicskillset/calanywhere-cloud/blob/main/calanywhere.jpg?raw=true)
 
 ## CalAnywhere Cloud
 

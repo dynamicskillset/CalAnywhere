@@ -5,7 +5,7 @@
 CalAnywhere Cloud is the managed hosting platform for CalAnywhere, a privacy-first scheduling tool. This repo extends the open-source core with cloud features for calanywhere.com.
 
 - **Upstream core:** github.com/dajbelshaw/CalAnywhere (AGPL-3.0)
-- **This repo:** github.com/dynamicskillset/CalAnywhere — BSL-1.1 (converts to AGPL-3.0 after 3 years per release)
+- **This repo:** github.com/dynamicskillset/calanywhere-cloud — BSL-1.1 (converts to AGPL-3.0 after 3 years per release)
 - **Built by:** Dynamic Skillset
 
 ## Upstream Contribution Rule
