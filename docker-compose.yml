@@ -20,12 +20,13 @@ services:
     environment:
       PORT: "4000"
       DATABASE_URL: postgresql://calanywhere:${POSTGRES_PASSWORD:-changeme}@db:5432/calanywhere
-      MAILGUN_API_KEY: ${MAILGUN_API_KEY}
-      MAILGUN_DOMAIN: ${MAILGUN_DOMAIN}
-      MAILGUN_FROM_EMAIL: ${MAILGUN_FROM_EMAIL}
-      MAILGUN_API_BASE: ${MAILGUN_API_BASE:-https://api.eu.mailgun.net}
       BASE_PUBLIC_URL: ${BASE_PUBLIC_URL:-http://localhost}
+      EMAIL_ENCRYPTION_KEY: ${EMAIL_ENCRYPTION_KEY:-}
       ALLOWED_ORIGIN: ${ALLOWED_ORIGIN:-*}
+      MAILGUN_API_KEY: ${MAILGUN_API_KEY:-}
+      MAILGUN_DOMAIN: ${MAILGUN_DOMAIN:-}
+      MAILGUN_FROM_EMAIL: ${MAILGUN_FROM_EMAIL:-}
+      MAILGUN_API_BASE: ${MAILGUN_API_BASE:-}
     depends_on:
       db:
         condition: service_healthy

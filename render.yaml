@@ -22,6 +22,12 @@ services:
         fromDatabase:
           name: calanywhere-db
           property: connectionString
+      - key: EMAIL_ENCRYPTION_KEY
+        sync: false
+      - key: BASE_PUBLIC_URL
+        sync: false
+      - key: ALLOWED_ORIGIN
+        value: "*"
       - key: MAILGUN_API_KEY
         sync: false
       - key: MAILGUN_DOMAIN
@@ -29,11 +35,7 @@ services:
       - key: MAILGUN_FROM_EMAIL
         sync: false
       - key: MAILGUN_API_BASE
-        value: https://api.eu.mailgun.net
-      - key: BASE_PUBLIC_URL
         sync: false
-      - key: ALLOWED_ORIGIN
-        value: "*"
 
   - type: web
     name: calanywhere-frontend
