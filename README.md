@@ -32,26 +32,7 @@ This repository adds:
 
 No OAuth. No email collection. No passwords. iCal URLs only.
 
-### Deploy to Render
-
-You can deploy a fully working instance using [Render](https://render.com):
-
-1. Fork this repo (or use it directly)
-2. Go to **Render** → **New** → **Blueprint**
-3. Select the repository. Render reads `render.yaml` and creates three services: **PostgreSQL**, **backend** (Node), and **frontend** (static site)
-4. Fill in the environment variables when prompted:
-
-   | Variable | Required | Value |
-   |---|---|---|
-   | `EMAIL_ENCRYPTION_KEY` | Yes | 64-char hex string. Generate with: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
-   | `BASE_PUBLIC_URL` | Yes | Your frontend URL, e.g. `https://calanywhere-frontend.onrender.com` |
-   | `MAILGUN_API_KEY` | No | Your Mailgun key (emails log to console when absent) |
-   | `MAILGUN_DOMAIN` | No | Your Mailgun domain |
-   | `MAILGUN_FROM_EMAIL` | No | e.g. `CalAnywhere <no-reply@example.com>` |
-
-5. Click **Apply**. Render provisions the database, builds both services, and gives you a live URL.
-
-> **Note:** If Render names your backend something other than `calanywhere-backend`, update the `/api/*` rewrite URL in the frontend service's **Redirects/Rewrites** settings to match.
+Cloud additions are licensed under the [Business Source License 1.1](LICENSE) (BSL-1.1). You can read the code, fork it, and use it for non-production purposes. Each release automatically converts to AGPL-3.0 three years after publication, at which point it becomes fully open source. The `backend/` and `frontend/` directories remain AGPL-3.0, inherited from upstream.
 
 ### Docker Compose (local)
 
@@ -71,9 +52,6 @@ git merge upstream/main
 ```
 
 ### Licence
-
-- **`backend/` and `frontend/`** — [AGPL-3.0](https://github.com/dajbelshaw/CalAnywhere/blob/main/LICENSE) (inherited from upstream)
-- **Cloud additions** — [BSL-1.1](LICENSE) (converts to AGPL-3.0 three years after each release)
 
 See [LICENSE](LICENSE) for full terms.
 
