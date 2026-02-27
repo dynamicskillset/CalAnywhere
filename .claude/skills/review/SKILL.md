@@ -13,5 +13,6 @@ Check each of the following and report pass/fail with brief notes:
 4. **Commit style:** Any commits follow Conventional Commits format (`type: description`).
 5. **MISTAKES.md:** If a new error pattern was encountered, has it been logged?
 6. **State accuracy:** Does STATE.md still accurately reflect component status after today's changes?
+7. **Upstream contribution:** Do any changed files in `backend/` or `frontend/` (outside `cloud/`) contain improvements that benefit self-hosters? If yes, classify each as upstream / cloud-only / mixed and note whether an upstream PR has been created or is pending. Run `git log --oneline upstream/main..HEAD -- backend/ frontend/` to check for uncontributed changes.
 
 Report the result of each check. If anything fails, describe what needs fixing.

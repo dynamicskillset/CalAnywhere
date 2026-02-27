@@ -42,6 +42,11 @@ Each entry captures a mistake made, its root cause, and how to prevent it. Updat
 - **Root Cause:** Copy-pasting older boilerplate.
 - **Prevention:** Use `express.json()` and `express.urlencoded()` directly. Don't add `body-parser` to new Express 4.16+ projects.
 
+### 2026-02-27 | Upstream-eligible changes committed without contribution
+- **Error:** 8 commits to origin/main contained shared improvements (SSRF protection, rate limiting, email service rewrite, EmojiPicker accessibility, Dockerfile fix, expired page handling, full auth UI) without any being contributed to the upstream repo (dajbelshaw/CalAnywhere).
+- **Root Cause:** The commit workflow had no upstream triage step. The review skill did not check for upstream-eligible changes.
+- **Prevention:** `/commit-push-pr` now has mandatory upstream triage (step 5) and contribution (step 8). `/review` has upstream check (check 7). `/handoff` tracks upstream debt. `/catchup` checks for it at session start.
+
 ---
 
 ## Patterns to Watch
@@ -50,3 +55,4 @@ Each entry captures a mistake made, its root cause, and how to prevent it. Updat
 - **Docker platform targeting:** Explicitly set `--platform` for production builds from Apple Silicon.
 - **Dependency hygiene:** Check if Express built-ins cover a dependency before adding it.
 - **Logging sensitivity:** Never log user-supplied URLs or tokens, even in development.
+- **Upstream contribution:** Every commit to `backend/` or `frontend/` must be triaged for upstream contribution. Don't batch and defer.

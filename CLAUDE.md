@@ -12,6 +12,24 @@ CalAnywhere Cloud is the managed hosting platform for CalAnywhere, a privacy-fir
 
 Only `cloud/` and code required specifically for the hosted SaaS belong in this repo. Everything else (backend/, frontend/, shared improvements) should be contributed back to the upstream repo at github.com/dajbelshaw/CalAnywhere.
 
+## Upstream Contribution Workflow
+
+Every commit touching `backend/` or `frontend/` (outside `cloud/`) must be assessed for upstream contribution. This is enforced by the `/commit-push-pr` skill (step 5: triage, step 8: upstream PR) and the `/review` skill (check 7).
+
+**Classification per file:**
+- **upstream** — security fixes, bug fixes, auth improvements, DX, Dockerfile fixes, frontend auth UI, general utilities
+- **cloud-only** — dashboard, tier enforcement, billing, Render config, `cloud/` directory
+- **mixed** — both; apply only upstream hunks via clean forward port
+
+**Process:**
+1. During `/commit-push-pr`, the triage table is generated for every commit
+2. Upstream-eligible changes are branched from `upstream/main` as `upstream/<topic>`
+3. Mixed files get a "clean forward port" (start from upstream base, apply only shared changes)
+4. PR created via `gh pr create --repo dajbelshaw/CalAnywhere`
+5. Deferred contributions logged as upstream debt in HANDOFF.md
+
+**Upstream remote:** `git@github.com:dajbelshaw/CalAnywhere.git` (remote name: `upstream`)
+
 ## Architecture
 
 ```

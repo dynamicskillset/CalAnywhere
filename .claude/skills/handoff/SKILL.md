@@ -16,6 +16,10 @@ Overwrite HANDOFF.md with the following structure (do not append — always repl
 ### What's next
 [Ordered list of the next immediate tasks, referencing PLAN.md phase if relevant]
 
+### Upstream Contribution Status
+- Pending upstream PRs: [list any open PRs to dajbelshaw/CalAnywhere, or "None"]
+- Upstream debt: [list files changed in backend/ or frontend/ not yet contributed, or "Clean"]
+
 ### Blockers / Notes
 [Any blockers, open decisions, or context that will matter next session. "None" if clean.]
 
