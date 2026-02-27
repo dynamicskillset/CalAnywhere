@@ -5,6 +5,8 @@ dist/
 
 # Claude Code — local-only files
 HANDOFF.md
+CLAUDE.md
 CLAUDE.local.md
+MISTAKES.md
 STATE.md
 PLAN.md
