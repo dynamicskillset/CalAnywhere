@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:npmjs.com)",
+      "WebFetch(domain:docs.stripe.com)",
+      "WebFetch(domain:developers.google.com)"
+    ]
+  }
+}
