@@ -24,7 +24,7 @@ The core scheduling engine lives at [dajbelshaw/CalAnywhere](https://github.com/
 
 This repository adds:
 
-- **Emoji ID accounts** — email-free auth using 3-emoji handles and iCal URL as credential
+- **Emoji ID accounts** — email-free auth using 3-emoji handles (e.g. 🐶🍕🚀) and iCal URL as credential
 - **Dashboard** — manage scheduling pages, view appointment requests
 - **Page ownership and expiry** — pages linked to user accounts with configurable expiry
 - **Encrypted notification emails** — AES-256-GCM encrypted, decrypted only at send time
