@@ -284,6 +284,7 @@ export function SchedulingPage() {
         notes,
         startIso: selectedSlot.start.toISOString(),
         endIso: selectedSlot.end.toISOString(),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         honeypot: website
       });
       setVerificationSent(true);
