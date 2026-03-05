@@ -81,7 +81,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <footer className="mt-auto pt-8 text-xs text-content-subtle">
+      <footer className="mt-10 text-xs text-content-subtle">
         <p>
           Privacy-first scheduling by{" "}
           <a href="https://dynamicskillset.com" className="underline hover:text-content-muted">
