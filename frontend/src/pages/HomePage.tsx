@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { countdownLabel } from "../utils/date";
 import { useAuth } from "../contexts/AuthContext";
+import pkg from "../../package.json";
 
 interface CreatePageResponse {
   slug: string;
@@ -177,6 +178,7 @@ export function HomePage() {
       )}
 
       <header className="mb-10">
+        <p className="mb-3 text-xs text-content-subtle">v{pkg.version}</p>
         <h1 className="text-3xl font-semibold tracking-tight text-content">
           Share your calendar availability privately
         </h1>
