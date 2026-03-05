@@ -1,7 +1,8 @@
 import { FormEvent, useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { countdownLabel } from "../utils/date";
+import { useAuth } from "../contexts/AuthContext";
 
 interface CreatePageResponse {
   slug: string;
@@ -28,6 +29,7 @@ const EXPIRY_OPTIONS = [
 
 export function HomePage() {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -165,6 +167,15 @@ export function HomePage() {
       id="main-content"
       className="mx-auto flex min-h-screen max-w-3xl flex-col px-4 py-10"
     >
+      {isAuthenticated && (
+        <div className="mb-6 flex items-center justify-between rounded-lg border border-border bg-surface-raised px-4 py-3">
+          <p className="text-sm text-content-muted">You have an account.</p>
+          <Link to="/dashboard" className="btn-primary text-sm">
+            Go to dashboard
+          </Link>
+        </div>
+      )}
+
       <header className="mb-10">
         <h1 className="text-3xl font-semibold tracking-tight text-content">
           Share your calendar availability privately
