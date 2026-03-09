@@ -59,6 +59,12 @@ export async function isSafeToFetch(url: string): Promise<boolean> {
 
   const hostname = parsed.hostname.toLowerCase();
 
+  // Block IPv6 literals — the URL API preserves brackets (e.g. "[::1]"),
+  // which net.isIPv6() does not recognise. Reject any bracketed hostname outright.
+  if (hostname.startsWith('[')) {
+    return false;
+  }
+
   // Block known metadata hostnames
   if (BLOCKED_HOSTNAMES.includes(hostname)) {
     return false;

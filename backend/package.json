@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "nodemon --watch src --ext ts,js --exec ts-node src/index.ts",
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "axios": "^1.7.0",
@@ -23,10 +25,15 @@
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.25",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.19.6",
     "@types/pg": "^8.16.0",
+    "@types/supertest": "^7.2.0",
     "@types/uuid": "^9.0.8",
+    "jest": "^30.2.0",
     "nodemon": "^3.0.0",
+    "supertest": "^7.2.2",
+    "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.0"
   }

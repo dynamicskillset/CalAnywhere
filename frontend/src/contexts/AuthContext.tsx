@@ -21,6 +21,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const me = await getMe();
       setSession(me);
+    } catch {
+      setSession(null);
     } finally {
       setIsLoading(false);
     }
