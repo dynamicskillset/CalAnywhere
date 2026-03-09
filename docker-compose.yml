@@ -27,6 +27,8 @@ services:
       MAILGUN_DOMAIN: ${MAILGUN_DOMAIN:-}
       MAILGUN_FROM_EMAIL: ${MAILGUN_FROM_EMAIL:-}
       MAILGUN_API_BASE: ${MAILGUN_API_BASE:-}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
     depends_on:
       db:
         condition: service_healthy
