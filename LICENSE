@@ -1,40 +1,21 @@
-Business Source License 1.1
+GNU AFFERO GENERAL PUBLIC LICENSE
+Version 3, 19 November 2007
 
-Parameters
+Copyright (C) 2026 Dynamic Skillset Ltd
 
-Licensor:             Dynamic Skillset Ltd
-Licensed Work:        CalAnywhere Cloud
-                      The Licensed Work is (c) 2025-2026 Dynamic Skillset Ltd.
-Additional Use Grant: You may make use of the Licensed Work, provided that you
-                      may not use the Licensed Work for a Commercial Hosting
-                      Service. A "Commercial Hosting Service" is a service that
-                      allows third parties to access the functionality of the
-                      Licensed Work by creating scheduling pages, managing
-                      calendars, or booking appointments as part of a paid or
-                      ad-supported offering.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-                      You may use the Licensed Work for internal use by a single
-                      organization, including self-hosting for up to 5 users.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
 
-Change Date:          Three years from the date of each published release of
-                      the Licensed Work.
-Change License:       GNU Affero General Public License v3.0
-
-Notice
-
-The Business Source License (this document, or the "License") is not an Open
-Source license. However, the Licensed Work will eventually be made available
-under an Open Source License, as stated in this License.
-
-For information about the terms of the Business Source License 1.1, see
-https://mariadb.com/bsl11/
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
-The CalAnywhere Cloud additions (everything under the cloud/ directory and any
-files not present in the upstream AGPL-3.0 repository) are licensed under this
-Business Source License 1.1.
-
-The core scheduling engine (backend/, frontend/, and all files inherited from
-https://github.com/dajbelshaw/Scheduler) remains licensed under the GNU Affero
-General Public License v3.0. See the upstream repository for the full AGPL text.
+For the full license text see: https://www.gnu.org/licenses/agpl-3.0.html

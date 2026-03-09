@@ -4,6 +4,7 @@ import axios from "axios";
 import { suggestEmojiIds, signup } from "../services/auth";
 import { createPage, updatePage } from "../services/dashboard";
 import { useAuth } from "../contexts/AuthContext";
+import { useConfig } from "../contexts/ConfigContext";
 
 // Internal steps: 1–7. Visual indicator maps to 4 dots.
 type InternalStep = 1 | 2 | 3 | 4 | 5 | 6 | 7;
@@ -64,6 +65,7 @@ const EXPIRY_PRESETS = [
 export function SignupPage() {
   const navigate = useNavigate();
   const { refresh, isAuthenticated } = useAuth();
+  const { signupsEnabled, isConfigLoading } = useConfig();
 
   const [step, setStep] = useState<InternalStep>(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -115,6 +117,13 @@ export function SignupPage() {
       navigate("/", { replace: true });
     }
   }, [isAuthenticated, step, navigate]);
+
+  // Redirect if signups are disabled
+  useEffect(() => {
+    if (!isConfigLoading && !signupsEnabled) {
+      navigate("/", { replace: true });
+    }
+  }, [isConfigLoading, signupsEnabled, navigate]);
 
   useEffect(() => {
     document.title = STEP_TITLES[step];

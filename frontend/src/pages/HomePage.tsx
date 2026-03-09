@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useConfig } from "../contexts/ConfigContext";
 import pkg from "../../package.json";
 
 export function HomePage() {
   const { isAuthenticated } = useAuth();
+  const { signupsEnabled } = useConfig();
 
   return (
     <main
@@ -36,9 +38,11 @@ export function HomePage() {
         </p>
         {!isAuthenticated && (
           <div className="mt-6 flex items-center gap-3">
-            <Link to="/signup" className="btn-primary">
-              Get started free
-            </Link>
+            {signupsEnabled && (
+              <Link to="/signup" className="btn-primary">
+                Get started free
+              </Link>
+            )}
             <Link to="/signin" className="btn-ghost">
               Sign in
             </Link>

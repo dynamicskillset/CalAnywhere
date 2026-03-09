@@ -8,6 +8,23 @@ This project uses [Pride Versioning](https://pridever.org): **PROUD.DEFAULT.SHAM
 
 ---
 
+## [1.0.2] — 2026-03-09 (DEFAULT)
+
+Operational infrastructure: admin dashboard, repo consolidation, and relicensing.
+
+### Added
+
+- **Admin dashboard** — password-protected at `/admin`, shows user/page stats and a signup toggle
+- **Signup toggle** — admin can disable new account creation without affecting existing users; home page and NavBar respond immediately via config API
+- **`GET /api/config`** — public endpoint for feature flags consumed by the frontend on load
+
+### Changed
+
+- **Relicensed to AGPL-3.0** — BSL-1.1 removed; this is now the single canonical CalAnywhere repo
+- **Repo consolidation** — `dajbelshaw/CalAnywhere` archived; all development continues here
+
+---
+
 ## [1.0.1] — 2026-03-09 (SHAME)
 
 Addressing the embarrassing hardcoded 09:00–17:00 availability window that shipped in 1.0.0.

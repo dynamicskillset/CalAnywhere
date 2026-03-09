@@ -86,6 +86,18 @@ export function createAuthRouter(pool: Pool): Router {
    * Body: { emojiId?: string, icalUrl: string }
    */
   router.post('/signup', signupLimiter, async (req: Request, res: Response) => {
+    // Check whether signups are currently enabled
+    try {
+      const { rows } = await pool.query(
+        "SELECT value FROM system_settings WHERE key = 'signups_enabled'"
+      );
+      if (rows.length > 0 && rows[0].value === 'false') {
+        return res.status(403).json({ error: 'New accounts are not currently being accepted.' });
+      }
+    } catch {
+      // system_settings table may not exist yet (pre-migration) — allow signup
+    }
+
     const { emojiId: requestedId } = req.body;
     const icalUrl = typeof req.body.icalUrl === 'string' ? req.body.icalUrl.trim() : req.body.icalUrl;
 

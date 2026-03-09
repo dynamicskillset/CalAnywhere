@@ -9,19 +9,21 @@ import { CreatePagePage } from "./pages/CreatePagePage";
 import { EditPagePage } from "./pages/EditPagePage";
 import { RequestsPage } from "./pages/RequestsPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import { AdminLoginPage } from "./pages/AdminLoginPage";
+import { AdminDashboardPage } from "./pages/AdminDashboardPage";
 import { NavBar } from "./components/NavBar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 export default function App() {
   const { pathname } = useLocation();
-  const isPublicSchedulingPage = pathname.startsWith("/s/");
+  const hideNav = pathname.startsWith("/s/") || pathname.startsWith("/admin");
 
   return (
     <div className="min-h-screen bg-surface-base text-content">
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
-      {!isPublicSchedulingPage && <NavBar />}
+      {!hideNav && <NavBar />}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/signup" element={<SignupPage />} />
@@ -60,6 +62,8 @@ export default function App() {
           }
         />
         <Route path="/s/:slug" element={<SchedulingPage />} />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin" element={<AdminDashboardPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </div>

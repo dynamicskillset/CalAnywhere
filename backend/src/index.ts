@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import { pagesRouter } from "./routes/pages";
 import { createAuthRouter } from "./auth";
 import { createDashboardRouter } from "./routes/dashboard";
+import { createAdminRouter } from "./routes/admin";
 import { initDatabase, getPool } from "./db/client";
 import { runMigrations } from "./db/migrate";
 import { initStores } from "./store";
@@ -40,6 +41,26 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
+/**
+ * GET /api/config — public endpoint consumed by the frontend on load.
+ * Returns feature flags that affect UI rendering (e.g. signupsEnabled).
+ */
+app.get("/api/config", async (_req, res) => {
+  const pool = getPool();
+  let signupsEnabled = true;
+  if (pool) {
+    try {
+      const { rows } = await pool.query(
+        "SELECT value FROM system_settings WHERE key = 'signups_enabled'"
+      );
+      if (rows.length > 0) signupsEnabled = rows[0].value !== "false";
+    } catch {
+      // DB not ready — default to open
+    }
+  }
+  res.json({ signupsEnabled });
+});
+
 app.use("/api/pages", pagesRouter);
 
 async function start() {
@@ -60,6 +81,7 @@ async function start() {
   if (pool) {
     app.use("/api/auth", createAuthRouter(pool));
     app.use("/api/dashboard", createDashboardRouter(pool));
+    app.use("/api/admin", createAdminRouter(pool));
   }
 
   // 404 handler must come after all route registrations

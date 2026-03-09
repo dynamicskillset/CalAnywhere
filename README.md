@@ -1,40 +1,35 @@
 ![CalAnywhere logo](https://github.com/dynamicskillset/calanywhere-cloud/blob/main/calanywhere.jpg?raw=true)
 
-## CalAnywhere Cloud
+## CalAnywhere
 
-The managed hosting platform for [CalAnywhere](https://github.com/dajbelshaw/CalAnywhere), the privacy-first scheduling tool for any calendar.
+Privacy-first scheduling for any calendar. No OAuth. No email collection. No passwords. iCal URLs only.
+
+Live at **[scheduler.dougbelshaw.com](https://scheduler.dougbelshaw.com)**.
+
+### What it does
+
+CalAnywhere creates scheduling pages that show only when you are free, not the details of your events. Anyone with an iCal feed — Google, Outlook, Proton, Apple, Fastmail — can use it. Visitors request a time, you get notified, that is it.
+
+Key properties:
+
+- **Email-free auth** — Emoji ID (3-emoji handle) + iCal URL as possession factor. No passwords, no OAuth
+- **Pages expire** — each page has a configurable expiry. When it expires, visitors see a clear message. Your calendar details are never stored
+- **Anti-Big Tech** — works with any calendar provider. No lock-in by design
 
 ### Architecture
 
-This repository extends the open-source CalAnywhere core with cloud features:
-
 ```
-backend/          # Express + TypeScript API
-  src/auth/       # Emoji ID authentication (email-free)
-  src/routes/     # Pages + dashboard API
+backend/          # Express + TypeScript API (AGPL-3.0)
+  src/auth/       # Emoji ID authentication
+  src/routes/     # Pages, dashboard, admin API
   src/db/         # PostgreSQL, migrations
-frontend/         # React + Vite + TypeScript UI
-  src/pages/      # Signup, signin, dashboard, scheduling
-  src/components/ # EmojiPicker, NavBar, shared UI
+frontend/         # React + Vite + TypeScript UI (AGPL-3.0)
+  src/pages/      # Signup, signin, dashboard, scheduling, admin
+  src/components/ # NavBar, shared UI
+cloud/            # Reserved for future Stripe billing
 ```
 
-### Relationship to the open-source core
-
-The core scheduling engine lives at [dajbelshaw/CalAnywhere](https://github.com/dajbelshaw/CalAnywhere) under AGPL-3.0. Anyone can self-host it for free.
-
-This repository adds:
-
-- **Emoji ID accounts** — email-free auth using 3-emoji handles (e.g. 🐶🍕🚀) and iCal URL as credential
-- **Dashboard** — manage scheduling pages, view appointment requests
-- **Page ownership and expiry** — pages linked to user accounts with configurable expiry
-- **Encrypted notification emails** — AES-256-GCM encrypted, decrypted only at send time
-- **Managed hosting** — the service at calanywhere.com
-
-No OAuth. No email collection. No passwords. iCal URLs only.
-
-Cloud additions are licensed under the [Business Source License 1.1](LICENSE) (BSL-1.1). You can read the code, fork it, and use it for non-production purposes. Each release automatically converts to AGPL-3.0 three years after publication, at which point it becomes fully open source. The `backend/` and `frontend/` directories remain AGPL-3.0, inherited from upstream.
-
-### Docker Compose (local)
+### Running locally
 
 ```bash
 cp backend/.env.example backend/.env
@@ -42,14 +37,18 @@ cp backend/.env.example backend/.env
 docker compose up --build
 ```
 
-The app will be available at `http://localhost`. Mailgun is optional for local development: emails are logged to the console when the env vars are absent.
+The app will be available at `http://localhost`. Mailgun is optional — emails are logged to the console when the env vars are absent.
 
-### Syncing with upstream
+### Admin
 
-```bash
-git fetch upstream
-git merge upstream/main
+An admin dashboard is available at `/admin/login`. Set credentials via env vars:
+
 ```
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=your-password-here
+```
+
+The admin dashboard shows basic stats and a toggle to enable or disable new signups.
 
 ### Releases
 
@@ -57,6 +56,7 @@ This project uses [Pride Versioning](https://pridever.org) (**PROUD.DEFAULT.SHAM
 
 | Version | Date | Type | Summary |
 |---------|------|------|---------|
+| [1.0.2](CHANGELOG.md#102--2026-03-09-default) | 2026-03-09 | DEFAULT | Admin dashboard, AGPL-3.0 relicensing, repo consolidation |
 | [1.0.1](CHANGELOG.md#101--2026-03-09-shame) | 2026-03-09 | SHAME | Configurable availability hours and timezone with DST support |
 | [1.0.0](CHANGELOG.md#100--2026-03-05-proud) | 2026-03-05 | PROUD | First proud release — auth, dashboard, page ownership, production deploy |
 
@@ -64,7 +64,7 @@ See [CHANGELOG.md](CHANGELOG.md) for full details.
 
 ### Licence
 
-See [LICENSE](LICENSE) for full terms.
+[GNU Affero General Public License v3.0](LICENSE) — see LICENSE for full terms.
 
 ---
 

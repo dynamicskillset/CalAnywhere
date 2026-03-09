@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useConfig } from "../contexts/ConfigContext";
 
 export function NavBar() {
   const { session, isLoading, isAuthenticated, logout } = useAuth();
+  const { signupsEnabled } = useConfig();
 
   return (
     <nav
@@ -51,9 +53,11 @@ export function NavBar() {
               >
                 Sign in
               </Link>
-              <Link to="/signup" className="btn-primary !min-h-0 !py-1.5 text-sm">
-                Sign up
-              </Link>
+              {signupsEnabled && (
+                <Link to="/signup" className="btn-primary !min-h-0 !py-1.5 text-sm">
+                  Sign up
+                </Link>
+              )}
             </>
           )}
         </div>
