@@ -244,6 +244,9 @@ pagesRouter.post("/", createPageLimiter, async (req, res) => {
       dateRangeDays,
       minNoticeHours: body.minNoticeHours ?? 8,
       includeWeekends: body.includeWeekends ?? false,
+      availabilityStart: '09:00',
+      availabilityEnd: '17:00',
+      ownerTimezone: 'UTC',
       createdAt: now,
       expiresAt
     });
@@ -330,6 +333,9 @@ pagesRouter.get("/:slug", async (req, res) => {
       dateRangeDays: page.dateRangeDays,
       minNoticeHours: page.minNoticeHours,
       includeWeekends: page.includeWeekends,
+      availabilityStart: page.availabilityStart ?? '09:00',
+      availabilityEnd: page.availabilityEnd ?? '17:00',
+      ownerTimezone: page.ownerTimezone ?? 'UTC',
       expiresAt: page.expiresAt,
       busySlots
     });

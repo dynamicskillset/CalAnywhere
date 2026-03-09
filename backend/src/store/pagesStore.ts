@@ -12,6 +12,9 @@ export interface SchedulingPage {
   dateRangeDays: number;
   minNoticeHours: number;
   includeWeekends: boolean;
+  availabilityStart: string; // wall-clock "HH:MM"
+  availabilityEnd: string;   // wall-clock "HH:MM"
+  ownerTimezone: string;     // IANA timezone name
   createdAt: number;
   expiresAt: number;
 }

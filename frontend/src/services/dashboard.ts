@@ -12,6 +12,9 @@ export interface DashboardPage {
   dateRangeDays: number;
   minNoticeHours: number;
   includeWeekends: boolean;
+  availabilityStart: string;
+  availabilityEnd: string;
+  ownerTimezone: string;
   hasNotificationEmail: boolean;
   isActive: boolean;
   createdAt: string;
@@ -35,6 +38,9 @@ export interface CreatePageInput {
   dateRangeDays?: number;
   minNoticeHours?: number;
   includeWeekends?: boolean;
+  availabilityStart?: string;
+  availabilityEnd?: string;
+  ownerTimezone?: string;
   expiryDays?: number;
 }
 
@@ -58,6 +64,9 @@ export interface UpdatePageInput {
   dateRangeDays?: number;
   minNoticeHours?: number;
   includeWeekends?: boolean;
+  availabilityStart?: string;
+  availabilityEnd?: string;
+  ownerTimezone?: string;
 }
 
 export interface AppointmentRequest {

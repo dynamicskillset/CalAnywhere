@@ -15,8 +15,9 @@ export class PgPagesStore implements IPagesStore {
            (slug, user_id, owner_name, title, bio,
             default_duration_minutes, buffer_minutes, date_range_days,
             min_notice_hours, include_weekends, is_anonymous,
+            availability_start, availability_end, owner_timezone,
             created_at, expires_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
          RETURNING id`,
         [
           page.slug,
@@ -30,6 +31,9 @@ export class PgPagesStore implements IPagesStore {
           page.minNoticeHours,
           page.includeWeekends,
           !page.userId, // is_anonymous when no user
+          page.availabilityStart ?? '09:00',
+          page.availabilityEnd ?? '17:00',
+          page.ownerTimezone ?? 'UTC',
           new Date(page.createdAt).toISOString(),
           new Date(page.expiresAt).toISOString(),
         ]
@@ -67,6 +71,9 @@ export class PgPagesStore implements IPagesStore {
          sp.date_range_days,
          sp.min_notice_hours,
          sp.include_weekends,
+         sp.availability_start,
+         sp.availability_end,
+         sp.owner_timezone,
          sp.created_at,
          sp.expires_at,
          COALESCE(
@@ -96,6 +103,9 @@ export class PgPagesStore implements IPagesStore {
       dateRangeDays: row.date_range_days,
       minNoticeHours: row.min_notice_hours,
       includeWeekends: row.include_weekends,
+      availabilityStart: row.availability_start ?? '09:00',
+      availabilityEnd: row.availability_end ?? '17:00',
+      ownerTimezone: row.owner_timezone ?? 'UTC',
       createdAt: new Date(row.created_at).getTime(),
       expiresAt: new Date(row.expires_at).getTime(),
     };

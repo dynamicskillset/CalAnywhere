@@ -51,6 +51,17 @@ git fetch upstream
 git merge upstream/main
 ```
 
+### Releases
+
+This project uses [Pride Versioning](https://pridever.org) (**PROUD.DEFAULT.SHAME**).
+
+| Version | Date | Type | Summary |
+|---------|------|------|---------|
+| [1.0.1](CHANGELOG.md#101--2026-03-09-shame) | 2026-03-09 | SHAME | Configurable availability hours and timezone with DST support |
+| [1.0.0](CHANGELOG.md#100--2026-03-05-proud) | 2026-03-05 | PROUD | First proud release — auth, dashboard, page ownership, production deploy |
+
+See [CHANGELOG.md](CHANGELOG.md) for full details.
+
 ### Licence
 
 See [LICENSE](LICENSE) for full terms.

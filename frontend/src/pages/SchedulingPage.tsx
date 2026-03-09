@@ -5,6 +5,7 @@ import { MiniCalendar } from "../components/MiniCalendar";
 import { WeekView } from "../components/WeekView";
 import type { Slot, WeekDayData } from "../components/WeekView";
 import { toDateStr, countdownLabel } from "../utils/date";
+import { wallClockToUtc } from "../utils/timezone";
 
 interface PageData {
   slug: string;
@@ -15,6 +16,9 @@ interface PageData {
   dateRangeDays: number;
   minNoticeHours: number;
   includeWeekends: boolean;
+  availabilityStart: string; // "HH:MM" in owner's timezone
+  availabilityEnd: string;   // "HH:MM" in owner's timezone
+  ownerTimezone: string;     // IANA name
   expiresAt: number;
   busySlots: { start: string; end: string }[];
 }
@@ -155,8 +159,10 @@ export function SchedulingPage() {
       }
 
       const slots: Slot[] = [];
-      const dayStart = new Date(day.getFullYear(), day.getMonth(), day.getDate(), 9, 0, 0, 0);
-      const dayEnd = new Date(day.getFullYear(), day.getMonth(), day.getDate(), 17, 0, 0, 0);
+      const dateStr = toDateStr(day);
+      const tz = page.ownerTimezone ?? 'UTC';
+      const dayStart = wallClockToUtc(dateStr, page.availabilityStart ?? '09:00', tz);
+      const dayEnd   = wallClockToUtc(dateStr, page.availabilityEnd   ?? '17:00', tz);
 
       for (
         let slotStart = dayStart.getTime();
@@ -186,6 +192,23 @@ export function SchedulingPage() {
       if (slots.length > 0) set.add(dateStr);
     }
     return set;
+  }, [allSlots]);
+
+  // Compute grid display range from actual slot times (visitor's local timezone)
+  const { gridStartHour, gridEndHour } = useMemo(() => {
+    let min = 23;
+    let max = 0;
+    for (const slots of allSlots.values()) {
+      for (const slot of slots) {
+        const startH = slot.start.getHours();
+        const endH = slot.end.getHours() + (slot.end.getMinutes() > 0 ? 1 : 0);
+        if (startH < min) min = startH;
+        if (endH > max) max = endH;
+      }
+    }
+    return max > min
+      ? { gridStartHour: min, gridEndHour: max }
+      : { gridStartHour: 9, gridEndHour: 17 };
   }, [allSlots]);
 
   // Current week's days
@@ -481,8 +504,8 @@ export function SchedulingPage() {
                 weekDays={weekDays}
                 selectedSlot={selectedSlot}
                 onSelectSlot={handleSlotSelect}
-                startHour={9}
-                endHour={17}
+                startHour={gridStartHour}
+                endHour={gridEndHour}
                 durationMinutes={page.defaultDurationMinutes}
                 bufferMinutes={page.bufferMinutes}
               />

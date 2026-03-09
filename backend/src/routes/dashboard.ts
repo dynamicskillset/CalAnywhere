@@ -19,6 +19,18 @@ function generateSlug(): string {
 // Basic email format check
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Validate HH:MM wall-clock time string
+const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+function isValidTimezone(tz: string): boolean {
+  try {
+    Intl.DateTimeFormat(undefined, { timeZone: tz });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // Calendar URL validation (same pattern as pages router)
 function isValidCalendarUrl(rawUrl: string): boolean {
   if (!rawUrl || rawUrl.length > 4096) return false;
@@ -64,6 +76,9 @@ export function createDashboardRouter(pool: Pool): Router {
          sp.date_range_days,
          sp.min_notice_hours,
          sp.include_weekends,
+         sp.availability_start,
+         sp.availability_end,
+         sp.owner_timezone,
          sp.notification_email_enc,
          sp.notification_email_iv,
          sp.notification_email_tag,
@@ -95,6 +110,9 @@ export function createDashboardRouter(pool: Pool): Router {
       dateRangeDays: row.date_range_days,
       minNoticeHours: row.min_notice_hours,
       includeWeekends: row.include_weekends,
+      availabilityStart: row.availability_start ?? '09:00',
+      availabilityEnd: row.availability_end ?? '17:00',
+      ownerTimezone: row.owner_timezone ?? 'UTC',
       hasNotificationEmail: !!row.notification_email_enc,
       isActive: row.is_active,
       createdAt: row.created_at,
@@ -128,6 +146,9 @@ export function createDashboardRouter(pool: Pool): Router {
       dateRangeDays,
       minNoticeHours,
       includeWeekends,
+      availabilityStart,
+      availabilityEnd,
+      ownerTimezone,
       expiryDays,
     } = req.body;
 
@@ -146,6 +167,22 @@ export function createDashboardRouter(pool: Pool): Router {
     if (bio && bio.length > 200) {
       return res.status(400).json({ error: 'Bio must not exceed 200 characters.' });
     }
+
+    // Validate availability window
+    const startTime: string = (typeof availabilityStart === 'string' && TIME_RE.test(availabilityStart))
+      ? availabilityStart
+      : '09:00';
+    const endTime: string = (typeof availabilityEnd === 'string' && TIME_RE.test(availabilityEnd))
+      ? availabilityEnd
+      : '17:00';
+    if (startTime >= endTime) {
+      return res.status(400).json({ error: 'Availability end time must be after start time.' });
+    }
+
+    // Validate timezone
+    const timezone: string = (typeof ownerTimezone === 'string' && ownerTimezone.length > 0 && isValidTimezone(ownerTimezone))
+      ? ownerTimezone
+      : 'UTC';
 
     // Validate notification email if provided
     if (notificationEmail) {
@@ -235,9 +272,10 @@ export function createDashboardRouter(pool: Pool): Router {
            (slug, user_id, owner_name, title, bio,
             notification_email_enc, notification_email_iv, notification_email_tag,
             default_duration_minutes, buffer_minutes, date_range_days,
-            min_notice_hours, include_weekends, is_anonymous,
-            created_at, expires_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,FALSE,$14,$15)
+            min_notice_hours, include_weekends,
+            availability_start, availability_end, owner_timezone,
+            is_anonymous, created_at, expires_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,FALSE,$17,$18)
          RETURNING id`,
         [
           slug,
@@ -253,6 +291,9 @@ export function createDashboardRouter(pool: Pool): Router {
           dateRangeDays ? Math.min(dateRangeDays, 180) : 60,
           minNoticeHours ?? 8,
           includeWeekends ?? false,
+          startTime,
+          endTime,
+          timezone,
           new Date(now).toISOString(),
           expiresAt.toISOString(),
         ]
@@ -336,6 +377,48 @@ export function createDashboardRouter(pool: Pool): Router {
         values.push(val);
         paramIndex++;
       }
+    }
+
+    // Handle availability window: validate both fields together
+    const patchStart = req.body.availabilityStart;
+    const patchEnd = req.body.availabilityEnd;
+    if (patchStart !== undefined || patchEnd !== undefined) {
+      // Read the other value from the existing row if only one was provided
+      const { rows: existing } = await pool.query(
+        'SELECT availability_start, availability_end FROM scheduling_pages WHERE id = $1',
+        [pageId]
+      );
+      const currentStart: string = existing[0]?.availability_start ?? '09:00';
+      const currentEnd: string = existing[0]?.availability_end ?? '17:00';
+
+      const newStart = (typeof patchStart === 'string' && TIME_RE.test(patchStart)) ? patchStart : currentStart;
+      const newEnd   = (typeof patchEnd   === 'string' && TIME_RE.test(patchEnd))   ? patchEnd   : currentEnd;
+
+      if (newStart >= newEnd) {
+        return res.status(400).json({ error: 'Availability end time must be after start time.' });
+      }
+
+      if (typeof patchStart === 'string') {
+        updates.push(`availability_start = $${paramIndex}`);
+        values.push(newStart);
+        paramIndex++;
+      }
+      if (typeof patchEnd === 'string') {
+        updates.push(`availability_end = $${paramIndex}`);
+        values.push(newEnd);
+        paramIndex++;
+      }
+    }
+
+    // Handle owner timezone
+    if (req.body.ownerTimezone !== undefined) {
+      const tz = req.body.ownerTimezone;
+      if (typeof tz !== 'string' || !isValidTimezone(tz)) {
+        return res.status(400).json({ error: 'Invalid timezone.' });
+      }
+      updates.push(`owner_timezone = $${paramIndex}`);
+      values.push(tz);
+      paramIndex++;
     }
 
     // Handle notification email separately (needs encryption)

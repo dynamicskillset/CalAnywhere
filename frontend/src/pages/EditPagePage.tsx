@@ -6,6 +6,19 @@ import {
   updatePage,
   type DashboardPage,
 } from "../services/dashboard";
+import { TimezoneSelect } from "../components/TimezoneSelect";
+import { detectTimezone } from "../utils/timezone";
+
+/** Generate HH:MM options from 00:00 to 23:30 in 30-minute steps. */
+function availabilityTimeOptions(): string[] {
+  const opts: string[] = [];
+  for (let h = 0; h < 24; h++) {
+    for (const m of [0, 30]) {
+      opts.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+    }
+  }
+  return opts;
+}
 
 export function EditPagePage() {
   const { id } = useParams<{ id: string }>();
@@ -29,6 +42,9 @@ export function EditPagePage() {
   const [dateRangeDays, setDateRangeDays] = useState(60);
   const [minNoticeHours, setMinNoticeHours] = useState(8);
   const [includeWeekends, setIncludeWeekends] = useState(false);
+  const [availabilityStart, setAvailabilityStart] = useState("09:00");
+  const [availabilityEnd, setAvailabilityEnd] = useState("17:00");
+  const [ownerTimezone, setOwnerTimezone] = useState(() => detectTimezone());
 
   // UI state
   const [isValidating, setIsValidating] = useState(false);
@@ -61,6 +77,9 @@ export function EditPagePage() {
         setDateRangeDays(found.dateRangeDays);
         setMinNoticeHours(found.minNoticeHours);
         setIncludeWeekends(found.includeWeekends);
+        setAvailabilityStart(found.availabilityStart ?? "09:00");
+        setAvailabilityEnd(found.availabilityEnd ?? "17:00");
+        setOwnerTimezone(found.ownerTimezone ?? detectTimezone());
       } catch {
         if (!cancelled) setLoadError("Could not load page details. Please try again.");
       }
@@ -142,6 +161,9 @@ export function EditPagePage() {
         dateRangeDays,
         minNoticeHours,
         includeWeekends,
+        availabilityStart,
+        availabilityEnd,
+        ownerTimezone,
       };
 
       if (clearEmail) {
@@ -349,6 +371,69 @@ export function EditPagePage() {
             CalAnywhere reads your busy/free times from this feed. Links are
             never stored in plain text. Free tier: up to 2 iCal links per page.
           </p>
+        </section>
+
+        {/* --- Availability --- */}
+        <section className="card space-y-5">
+          <h2 className="text-base font-semibold text-content">
+            Availability
+          </h2>
+
+          <div>
+            <label htmlFor="owner-timezone" className="label">
+              Your timezone
+            </label>
+            <TimezoneSelect
+              id="owner-timezone"
+              value={ownerTimezone}
+              onChange={setOwnerTimezone}
+              className="input mt-2"
+              aria-describedby="owner-timezone-hint"
+            />
+            <p id="owner-timezone-hint" className="label-hint">
+              Times shown to visitors are converted from this timezone. Daylight
+              saving time is handled automatically.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-5">
+            <div>
+              <label htmlFor="avail-start" className="label">
+                Available from
+              </label>
+              <select
+                id="avail-start"
+                value={availabilityStart}
+                onChange={(e) => setAvailabilityStart(e.target.value)}
+                className="input mt-2"
+              >
+                {availabilityTimeOptions().map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="avail-end" className="label">
+                Available until
+              </label>
+              <select
+                id="avail-end"
+                value={availabilityEnd}
+                onChange={(e) => setAvailabilityEnd(e.target.value)}
+                className="input mt-2"
+              >
+                {availabilityTimeOptions().map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+              {availabilityStart >= availabilityEnd && (
+                <p className="mt-1 text-xs text-error-text" role="alert">
+                  End time must be after start time.
+                </p>
+              )}
+            </div>
+          </div>
         </section>
 
         {/* --- Scheduling settings --- */}
