@@ -10,7 +10,8 @@ import { validateMultipleCalendarUrls } from '../services/calendar';
 // Free tier limits
 const FREE_MAX_PAGES = 1;
 const FREE_MAX_EXPIRY_DAYS = 30;
-const FREE_MAX_CALENDAR_URLS = 2; // TODO: higher limit for paid tier
+const FREE_MAX_CALENDAR_URLS = 2;
+const ADMIN_MAX_CALENDAR_URLS = 10;
 
 function isAdminTier(tier: string): boolean {
   return tier === 'admin';
@@ -349,6 +350,8 @@ export function createDashboardRouter(pool: Pool): Router {
    */
   router.patch('/pages/:id', dashboardWriteLimiter, async (req: Request, res: Response) => {
     const userId = req.session!.userId;
+    const tier = req.session!.tier ?? 'free';
+    const adminUser = isAdminTier(tier);
     const pageId = req.params.id;
 
     // Verify ownership
@@ -488,9 +491,10 @@ export function createDashboardRouter(pool: Pool): Router {
 
       if (newCalendarUrls && Array.isArray(newCalendarUrls)) {
         const urls = newCalendarUrls.filter(u => typeof u === 'string' && u.trim().length > 0);
-        if (urls.length === 0 || urls.length > FREE_MAX_CALENDAR_URLS) {
+        const maxUrls = adminUser ? ADMIN_MAX_CALENDAR_URLS : FREE_MAX_CALENDAR_URLS;
+        if (urls.length === 0 || urls.length > maxUrls) {
           await client.query('ROLLBACK');
-          return res.status(400).json({ error: `Free tier allows up to ${FREE_MAX_CALENDAR_URLS} iCal links per page.` });
+          return res.status(400).json({ error: `Your tier allows up to ${maxUrls} iCal links per page.` });
         }
 
         for (const url of urls) {
